@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/index.css" />
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.js"></script>
+    <script src="./js/index.js"></script>
+    <title>登录</title>
+    <style>
+        body {
+            margin: 0 auto;
+        }
+        #app {
+            background: url("img/login/login_bg.jpg") no-repeat;
+            background-size: cover;
+            width: 100%;
+            height: calc(100vh);
+        }
+        .el-button {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <transition name="el-fade-in-linear">
+        <div id="app">
+            <template>
+                <div>
+                  <div class="card" style="display: flex;justify-content: center;padding-top: 275px">
+                    <el-card style="width: 400px">
+                      <div slot="header" class="clearfix" style="text-align: center;" v-text="title"></div>
+                      <el-form ref="ruleForm" label-width="100px" class="demo-ruleForm" style="padding-top: 10px;">
+                        <el-form-item label="用户名：" prop="name">
+                            <el-col :span="20">
+                                <el-input v-model="user.name"></el-input>
+                            </el-col>
+                        </el-form-item>
+                        <el-form-item label="密码：" prop="password">
+                            <el-col :span="20">
+                                <el-input type="password" v-model="user.pass_word"></el-input>
+                            </el-col>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="LoginSub" v-text="title"></el-button>
+                            <el-button @click="registe">
+                                <span v-if="this.isLogin">注册</span>
+                                <span v-else>登录</span>
+                            </el-button>                            
+                        </el-form-item>
+                      </el-form>
+                    </el-card>
+                  </div>
+                </div>
+              </template>
+        </div>
+    </transition>
+</body>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data() {
+            return {
+                title:"登录",
+                isLogin:true,
+                user:{
+                    name : '',
+                    pass_word : ''
+                }
+            }
+        },
+        methods:{
+            LoginSub() {
+                if(this.isLogin){
+                    axios.post("/login",this.user)
+                    .then(resp=>{
+                        if (resp.data) {
+                            window.location.href = "/index";
+                        } else {
+                            this.$message.error("登录失败！用户名或密码错误！")
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                } else {
+                    axios.post("/registe",this.user)
+                    .then(resp=>{
+                        if(resp.data) {
+                            this.$message({
+                                message: '注册成功！',
+                                type: 'success'
+                            });
+                        } else {
+                            this.$message.error('注册失败！')
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                }
+            },
+            registe() {
+                this.title = this.isLogin?'注册':'登录'
+                this.isLogin = !this.isLogin;                
+                this.user = {name:'',pass_word:''};
+            }
+        }
+    })
+</script>
+</html>

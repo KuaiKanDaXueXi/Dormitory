@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.RoomMapper">
+    <select id="queryRoom" parameterType="com.xian.pojo.Room" resultType="com.xian.pojo.Room">
+        select r.* from tb_room r,tb_room_build rb
+        <where>
+            r.id = rb.r_id
+            <if test="r_id!=null">
+                and rb.r_id = #{r_id}
+            </if>
+            <if test="b_num!=null">
+                and rb.b_num = #{b_num}
+            </if>
+        </where>
+    </select>
+    <insert id="addRoom" parameterType="com.xian.pojo.Room">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tb_room values (default,#{r_id},#{r_total},default)
+    </insert>
+    <update id="updateRoom" parameterType="com.xian.pojo.Room">
+        update tb_room
+        <set>
+            <if test="r_id!=null">
+                r_id = #{r_id} ,
+            </if>
+            <if test="r_total!=null">
+                r_total = #{r_total} ,
+            </if>
+            <if test="r_use!=null">
+                r_use = #{r_use} ,
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <update id="updateRoomFloorRelation">
+        update tb_room_build set b_num = #{b_num} where r_id = #{id}
+    </update>
+    <select id="getNoFullRoom" resultType="com.xian.pojo.Room">
+        select r.* from tb_room r,tb_room_build rb
+        <where>
+            r.id = rb.r_id and r.r_use <![CDATA[ < ]]> r.r_total
+            <if test="b_num!=null">
+                and rb.b_num = #{b_num}
+            </if>
+        </where>
+    </select>
+</mapper>

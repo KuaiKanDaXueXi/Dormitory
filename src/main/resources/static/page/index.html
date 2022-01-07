@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/index.css" />
+    <script src="../js/vue.js"></script>
+    <script src="../js/vue-router.js"></script>
+    <script src="../js/axios.js"></script>
+    <script src="../js/index.js"></script>
+    <title>个人中心</title>
+    <style>
+        body {
+          margin: 0 auto;
+        }
+
+        .el-header, .el-footer {
+          background-color: rgb(67, 180, 125);
+          color: #fff;
+          text-align: center;
+          line-height: 60px;
+        }
+        
+        .el-main {
+          background-color: #E9EEF3;
+          color: #333;
+          text-align: center;
+          line-height: 200px;
+        }
+        
+        body > .el-container {
+          margin-bottom: 40px;
+        }
+        
+        .el-container:nth-child(5) .el-aside,
+        .el-container:nth-child(6) .el-aside {
+          line-height: 260px;
+        }
+        
+        .el-container:nth-child(7) .el-aside {
+          line-height: 320px;
+        }
+
+        .el-menu,.el-submenu{
+            background-color: rgb(67, 180, 125);
+        }
+
+        .el-menu{
+            margin: 0;
+        }
+        .el-menu-item:hover,.el-submenu__title:hover{
+            background-color: rgb(40, 119, 81) !important;
+        }
+
+        .el-menu-item.is-active{
+            background-color: rgb(40, 119, 81) !important;
+        }
+
+        .el-menu-item{
+          background-color: rgb(67, 180, 125) !important;
+        }
+
+        .el-menu{
+            margin: 0 auto;
+        }
+
+        .el-aside{
+            height: calc(100vh - 60px);
+        }
+
+        .el-main{
+            height: calc(100vh - 120px);
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        iframe{
+            width: 100%;
+            height: 100%;
+        }
+      </style>
+</head>
+<body>
+    <div id="app">
+        <el-container>
+                <el-header>
+                    <img src="./img/index/indexIcon.png" alt="宿舍管理系统" style="height: inherit;float: left">
+                    <span style="width: 100px;height: inherit;display: block;float: right">
+                        <el-menu class="el-menu-demo" mode="horizontal" active-text-color="#fff">
+                            <el-menu-item index="1" style="color: white" @click="exit">退出登录</el-menu-item>
+                        </el-menu>
+                    </span>
+                </el-header>
+            <el-container>
+                <el-aside width="200px" style="background-color: rgb(67, 180, 125)" height="500px">
+                    <el-menu
+                            :default-openeds="['1']"
+                            text-color="#fff"
+                            active-text-color="#fff">
+                        <el-submenu index="1">
+                            <template slot="title"><i class="el-icon-s-custom" style="color: white"></i>系统管理</template>
+                            <a href="/page/admin_manage.html" target="window"><el-menu-item index="1-1">管理员信息</el-menu-item></a>
+                        </el-submenu>
+                        <el-submenu index="2">
+                            <template slot="title"><i class="el-icon-school" style="color: white"></i>宿舍管理</template>
+                            <a href="/page/floor.html" target="window"><el-menu-item index="2-1">宿舍楼</el-menu-item></a>
+                            <a href="/page/room.html" target="window"><el-menu-item index="2-2">宿舍</el-menu-item></a>
+                        </el-submenu>
+                        <el-submenu index="3">
+                            <template slot="title"><i class="el-icon-user" style="color: white"></i>住宿管理</template>
+                            <a href="/page/student.html" target="window"><el-menu-item index="3-1">学生信息</el-menu-item></a>
+                            <a href="/page/student_in.html" target="window"><el-menu-item index="3-2">学生入住</el-menu-item></a>
+                            <a href="/page/student_out.html" target="window"><el-menu-item index="3-3">学生退宿</el-menu-item></a>
+                        </el-submenu>
+                        <el-submenu index="4">
+                            <template slot="title"><i class="el-icon-user-solid" style="color: white"></i>维修管理</template>
+                            <a href="/page/repair.html" target="window"><el-menu-item index="4-1">维修管理</el-menu-item></a>
+                            <a href="/page/repair_pay.html" target="window"><el-menu-item index="4-2">赔付管理</el-menu-item></a>
+                        </el-submenu>
+                        <el-submenu index="5">
+                            <template slot="title"><i class="el-icon-user-solid" style="color: white"></i>访客管理</template>
+                            <a href="/page/vistor.html" target="window"><el-menu-item index="5-1">访客信息</el-menu-item></a>
+                        </el-submenu>
+                    </el-menu>
+                </el-aside>
+                <el-container>
+                    <el-main>
+                        <iframe name="window" frameborder="0" scrolling="no"></iframe>
+                    </el-main>
+                    <el-footer>Copyright © 小组</el-footer>
+                </el-container>
+            </el-container>
+        </el-container>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el:"#app",
+        data() {
+            return {
+                activeIndex: '1'
+            };
+        },
+        methods: {
+            exit() {
+                this.$confirm('您确定要退出登录吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.get("/exit")
+                    .then(()=>{
+                        this.$message({
+                            type: 'success',
+                            message: '退出成功!'
+                        });
+                        setTimeout(function () {
+                            window.location.href = "/login"
+                        }, 1500)
+                    })
+                });
+            },
+        }
+    })
+</script>
+</html>

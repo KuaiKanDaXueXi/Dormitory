@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.StuMapper">
+    <select id="searchStuByInfo" resultType="com.xian.pojo.Stu">
+        select s.* from tb_stu s,tb_room r,tb_room_build rb
+        <where>
+            s.r_id = r.id and rb.r_id = r.id
+            <if test="s_num!=null and s_num!=''">
+                and s.s_num = #{s_num}
+            </if>
+            <if test="s_name!=null and s_name!=''">
+                and s.s_name like '%${s_name}%'
+            </if>
+            <if test="s_class!=null and s_class!=''">
+                and s.s_class like '%${s_class}%'
+            </if>
+            <if test="r_id!=null">
+                and r.id = #{r_id}
+            </if>
+            <if test="b_num!=null">
+                and rb.b_num = #{b_num}
+            </if>
+        </where>
+    </select>
+    <select id="searchNoRoom" parameterType="com.xian.pojo.Stu" resultType="com.xian.pojo.Stu">
+        select * from tb_stu
+        <where>
+            r_id is null
+            <if test="s_num!=null and s_num!=''">
+                and s_num=#{s_num}
+            </if>
+            <if test="s_name!=null and s_name!=''">
+                and s_name like '%${s_name}%'
+            </if>
+        </where>
+    </select>
+    <update id="update" parameterType="com.xian.pojo.Stu">
+        update tb_stu
+        <set>
+            <if test="r_id!=null">
+                r_id = #{r_id},
+            </if>
+            <if test="s_num!=null and s_num!=''">
+                s_num = #{s_num},
+            </if>
+            <if test="s_name!=null and s_name!=''">
+                s_name = #{s_name},
+            </if>
+            <if test="s_class!=null and s_class!=''">
+                s_class = #{s_class},
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <update id="outRoom" parameterType="com.xian.pojo.Stu">
+        update tb_stu
+        <set>
+            r_id = null
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <insert id="addStuRoomRelation">
+        insert into tb_in_room values(default,#{s_num},#{r_id},#{date})
+    </insert>
+    <insert id="delStuRoomRelation">
+        insert into tb_out_room values(default,#{s_num},#{r_id},#{date})
+    </insert>
+    <select id="searchStu" parameterType="com.xian.pojo.Stu" resultType="com.xian.pojo.Stu">
+        SELECT s.* FROM (SELECT * from tb_stu <where>
+        <if test="s_num!=null and s_num!=''">s_num = #{s_num}</if>
+        <if test="s_name!=null and s_name!=''">s_name like '%${s_name}%'</if>
+        </where>
+                                                    ) s LEFT JOIN (SELECT r.r_id FROM tb_room r,tb_room_build rb WHERE rb.r_id = r.id) tr on s.r_id = tr.r_id;
+    </select>
+    <select id="searchHaveRoom" parameterType="com.xian.pojo.Stu" resultType="com.xian.pojo.Stu">
+        select * from tb_stu
+        <where>
+            r_id is not null
+            <if test="s_num!=null and s_num!=''">
+                and s_num=#{s_num}
+            </if>
+            <if test="s_name!=null and s_name!=''">
+                and s_name like '%${s_name}%'
+            </if>
+        </where>
+    </select>
+</mapper>

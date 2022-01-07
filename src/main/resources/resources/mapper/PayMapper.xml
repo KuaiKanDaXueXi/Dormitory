@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.PayMapper">
+    <update id="updatePay" parameterType="com.xian.pojo.Pay">
+        update tb_pay
+        <set>
+            <if test="r_id!=null">
+                r_id = #{r_id} ,
+            </if>
+            <if test="note!=null and note!=''">
+                note = #{note} ,
+            </if>
+            <if test="amount!=null">
+                amount = #{amount} ,
+            </if>
+            <if test="date!=null">
+                date = #{date} ,
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+</mapper>

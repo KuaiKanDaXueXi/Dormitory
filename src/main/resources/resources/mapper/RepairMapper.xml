@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.RepairMapper">
+    <update id="updateRepair" parameterType="com.xian.pojo.Repair">
+        update tb_fix
+        <set>
+            <if test="r_id!=null">
+                r_id = #{r_id} ,
+            </if>
+            <if test="note!=null and note!=''">
+                note = #{note} ,
+            </if>
+            <if test="date!=null">
+                date = #{date} ,
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+</mapper>

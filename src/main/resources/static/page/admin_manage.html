@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/index.css" />
+    <script src="../js/vue.js"></script>
+    <script src="../js/axios.js"></script>
+    <script src="../js/index.js"></script>
+    <title>管理员信息</title>
+    <style>
+        body{
+            margin: 0;
+        }
+        .el-header {
+            color: #333;
+            text-align: center;
+            line-height: 60px;
+            width: 100%;
+            height: 60px;
+        }
+
+        .el-main {
+            background-color: #E9EEF3;
+            color: #333;
+            width: 100%;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <div style="width: 70%;margin: 0 auto">
+                <el-breadcrumb separator-class="el-icon-arrow-right" style="line-height: 60px">
+                    <el-breadcrumb-item :to="{ path: '/index' }">首页</el-breadcrumb-item>
+                    <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+                    <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
+                </el-breadcrumb>
+                </div>
+            </el-header>
+            <el-main>
+                <div style="width: 70%;margin: 0 auto">
+                    <br>
+                    <div class="demo-input-size">
+                        <el-col :span="4">
+                            <el-input
+                                    placeholder="请输入用户名"
+                                    v-model="searchUser.name"
+                                    clearable>
+                            </el-input>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-input
+                                    placeholder="请输入姓名"
+                                    v-model="searchUser.realname"
+                                    clearable>
+                            </el-input>
+                        </el-col>
+                        <el-button plain @click="queryUser"><i class="el-icon-search"></i>搜索</el-button>
+                        <el-button type="primary" @click="addUser">添加</el-button>
+                    </div>
+                    <br>
+                    <el-table
+                            :data="userList"
+                            stripe
+                            style="width: 100%">
+                        <el-table-column
+                                type="index"
+                                label="序号"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="realname"
+                                label="姓名">
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="用户名">
+                        </el-table-column>
+                        <el-table-column
+                                label="权限">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.power==1">超级管理员</span>
+                                <span v-else>普通管理员</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                label="操作"
+                                width="100">
+                            <template slot-scope="scope">
+                                <el-button @click="modifyUser(scope.row)" type="text" size="small">编辑</el-button>
+                                <el-button @click="delUser(scope.row.id)" type="text" size="small">删除</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <br>
+            </el-main>
+            <el-dialog
+                    :title="title"
+                    :visible.sync="dialogVisible"
+                    :header-cell-style="{'text-align':'center'}"
+                    :cell-style="{'text-align':'center'}"
+                    width="30%">
+                <el-form ref="ruleForm" label-width="100px" class="demo-ruleForm" style="padding-top: 10px;">
+                    <el-form-item label="用户名：" prop="name">
+                        <el-col :span="20">
+                            <el-input v-model="user.name"></el-input>
+                        </el-col>
+                    </el-form-item>
+                    <el-form-item label="姓名：" prop="realname">
+                        <el-col :span="20">
+                            <el-input v-model="user.realname"></el-input>
+                        </el-col>
+                    </el-form-item>
+                    <el-form-item label="权限：">
+                        <template>
+                            <el-radio v-model="user.power" :label="0">普通管理员</el-radio>
+                            <el-radio v-model="user.power" :label="1">超级管理员</el-radio>
+                        </template>
+                    </el-form-item>
+                    <span v-if="isAdd">
+                        <el-form-item label="密码：" prop="password">
+                        <el-col :span="20">
+                            <el-input type="password" v-model="user.pass_word"></el-input>
+                        </el-col>
+                        </el-form-item>
+                    </span>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="commitOp" v-text="title"></el-button>
+                    <el-button @click="cancleOp">取 消</el-button>
+                </span>
+            </el-dialog>
+        </el-container>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:'#app',
+        data(){
+            return{
+                title:"添加",
+                userList:null,
+                searchUser:{name:'',realname:''},
+                user:{name:'',power:0,realname:''},
+                dialogVisible: false,
+                isAdd: false
+            }
+        },
+        methods:{
+            queryUser() {
+                axios.post('/user/search',this.searchUser)
+                .then(resp=>{
+                    this.userList=resp.data;
+                })
+            },
+            getAll(){
+                axios.get('/user/findAll')
+                .then(resp=>{
+                    this.userList=resp.data;
+                })
+            },
+            addUser(){
+                this.user={name:'',power:null,realname:''};
+                this.dialogVisible=true;
+                this.isAdd=true;
+                this.title='添加'
+            },
+            modifyUser(user){
+                this.user=user;
+                this.dialogVisible=true;
+                this.isAdd=false;
+                this.title='修改'
+            },
+            delUser(id){
+                this.$confirm('您确认删除吗？')
+                .then(_ => {
+                    axios.delete("/user/del/"+id)
+                    .then(resp=>{
+                        this.getAll();
+                        this.title='删除';
+                        this.dialog(resp.data);
+                    })
+                })
+                .catch(_ => {});
+            },
+            cancleOp(){
+                this.dialogVisible = false;
+                this.user={name:'',power:null,realname:''};
+            },
+            dialog(flag){
+                if (flag) {
+                    this.$message({
+                        message: this.title+'成功！',
+                        type: 'success'
+                    });
+                } else {
+                    this.$message.error(this.title+'失败！');
+                }
+            },
+            commitOp(){
+                if (this.isAdd){
+                    axios.post("/user/add",this.user)
+                    .then(resp=>{
+                        this.getAll();
+                        this.dialog(resp.data);
+                        this.cancleOp();
+                    })
+                } else {
+                    axios.post("/user/modify",this.user)
+                    .then(resp=>{
+                        this.getAll();
+                        this.dialog(resp.data);
+                        this.cancleOp();
+                    })
+                }
+            }
+        },
+        created() {
+            this.getAll();
+        }
+    })
+</script>
+</html>

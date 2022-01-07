@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dor
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 5
+      idle-timeout: 10000
+      maximum-pool-size: 10
+      auto-commit: true
+      pool-name: MyHikariCP
+      max-lifetime: 18000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  mvc:
+    view:
+      prefix: "/page/"
+      suffix: ".html"
+    hiddenmethod:
+      filter:
+        enabled: on
+mybatis:
+  mapper-locations: classpath:resources/mapper/*.xml
